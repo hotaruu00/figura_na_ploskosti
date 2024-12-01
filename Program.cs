@@ -1,84 +1,114 @@
-﻿using System;
+using System;
 
 namespace ShapeInterface
 {
     // Интерфейс определяет методы для работы с фигурой на плоскости
     interface IShape
     {
-        // Метод для перемещения фигуры на заданные значения по осям X и Y
-        void Move(double deltaX, double deltaY);
-
-        // Метод для поворота фигуры на указанный угол
-        void Rotate(double angle);
-
-        // Метод для определения площади фигуры
-        double GetArea();
-
-        // Метод для получения текущего местоположения фигуры
-        string GetLocation();
+        void Move(double deltaX, double deltaY); // Перемещение фигуры
+        void Rotate(double angle);              // Поворот фигуры
+        double GetArea();                       // Площадь фигуры
+        string GetLocation();                   // Текущее местоположение
     }
 
     // Базовый класс, представляющий фигуру на плоскости
     class Shape : IShape
     {
-        private double x;
-        private double y;
+        protected double x; // Координата X
+        protected double y; // Координата Y
+        protected double rotationAngle; // Текущий угол поворота фигуры
 
-        // Конструктор класса Shape, устанавливающий начальное местоположение фигуры
         public Shape(double x, double y)
         {
             this.x = x;
             this.y = y;
+            this.rotationAngle = 0; // Начальный угол поворота
         }
 
-        // Реализация метода Move интерфейса IShape
         public void Move(double deltaX, double deltaY)
         {
-            // Изменяем координаты фигуры на указанные значения
             x += deltaX;
             y += deltaY;
         }
 
-        // Реализация метода Rotate интерфейса IShape
         public void Rotate(double angle)
         {
-            // Здесь должна быть реализация логики поворота фигуры
-            Console.WriteLine($"Фигура повернута на {angle} градусов.");
+            rotationAngle += angle;
+            rotationAngle %= 360; // Угол остается в пределах 0–360 градусов
+            Console.WriteLine($"Фигура повернута. Текущий угол: {rotationAngle} градусов.");
         }
 
-        // Реализация метода GetArea интерфейса IShape
-        // Отсутствие реализации функциональности расчета площади фигуры
-        public double GetArea()
+        public virtual double GetArea()
         {
-            // Здесь должна быть реализация логики определения площади фигуры
-            Console.WriteLine("Расчет площади не реализован.");
+            Console.WriteLine("Площадь фигуры базового класса не определена.");
             return 0;
         }
 
-        // Реализация метода GetLocation интерфейса IShape
         public string GetLocation()
         {
-            // Возвращаем текущие координаты фигуры в виде строки
             return $"({x}, {y})";
         }
     }
 
-    // Класс для демонстрации работы с фигурой
+    // Производный класс Rectangle (Прямоугольник)
+    class Rectangle : Shape
+    {
+        private double width;  // Ширина
+        private double height; // Высота
+
+        public Rectangle(double x, double y, double width, double height) : base(x, y)
+        {
+            this.width = width;
+            this.height = height;
+        }
+
+        public override double GetArea()
+        {
+            return width * height;
+        }
+    }
+
+    // Производный класс Triangle (Треугольник)
+    class Triangle : Shape
+    {
+        private double baseLength; // Основание
+        private double height;     // Высота
+
+        public Triangle(double x, double y, double baseLength, double height) : base(x, y)
+        {
+            this.baseLength = baseLength;
+            this.height = height;
+        }
+
+        public override double GetArea()
+        {
+            return 0.5 * baseLength * height;
+        }
+    }
+
     class Program
     {
         static void Main(string[] args)
         {
-            // Создаем объект класса Shape
-            Shape shape = new Shape(5, 8);
-            Console.WriteLine("Начальное местоположение: " + shape.GetLocation());
+            // Демонстрация работы с прямоугольником
+            Rectangle rect = new Rectangle(5, 8, 10, 4);
+            Console.WriteLine("Прямоугольник:");
+            Console.WriteLine("Начальное местоположение: " + rect.GetLocation());
+            Console.WriteLine("Площадь: " + rect.GetArea());
 
-            // Перемещаем фигуру
-            shape.Move(6, 40);
-            Console.WriteLine("Новое местоположение после перемещения: " + shape.GetLocation());
+            rect.Move(6, 4);
+            Console.WriteLine("Новое местоположение: " + rect.GetLocation());
+            rect.Rotate(45);
 
-            // Поворачиваем фигуру
-            shape.Rotate(45);
-            Console.WriteLine("Местоположение после поворота: " + shape.GetLocation());
+            // Демонстрация работы с треугольником
+            Triangle tri = new Triangle(2, 3, 6, 4);
+            Console.WriteLine("\nТреугольник:");
+            Console.WriteLine("Начальное местоположение: " + tri.GetLocation());
+            Console.WriteLine("Площадь: " + tri.GetArea());
+
+            tri.Move(1, 1);
+            Console.WriteLine("Новое местоположение: " + tri.GetLocation());
+            tri.Rotate(30);
         }
     }
 }
